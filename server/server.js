@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
+const { db } = require("./firebase/firebase");
 
 const app = express();
 const PORT = process.env.PORT;
