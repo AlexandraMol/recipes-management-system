@@ -17,6 +17,8 @@
       ></v-text-field>
       <v-btn type="submit" class="mt-2" color="black" block>Submit</v-btn>
     </v-form>
+    <!-- TODO: Add toaster for errors -->
+    <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
   </div>
 </template>
 
@@ -29,6 +31,8 @@ import {
   VTextField,
   VBtn,
 } from "vuetify/components";
+import { mapGetters, mapActions } from "vuex";
+
 export default {
   name: "Register",
   components: {
@@ -41,6 +45,7 @@ export default {
   },
   data: () => ({
     valid: false,
+    errorMessage: "",
     email: "",
     emailRules: [
       (value) => {
@@ -60,12 +65,23 @@ export default {
       },
     ],
   }),
+  computed: {
+    ...mapGetters(["isLoggedIn"]),
+  },
+
   methods: {
-    submitLogin() {
+    ...mapActions(["login"]),
+    async submitLogin() {
       if (this.valid) {
         alert(`Form data:\nEmail: ${this.email}\nPassword: ${this.password}`);
-        //TODO: route to backend
-        this.$router.push("/explore");
+        //TODO: refactor when route to backend is done
+        try {
+          await this.login({ email: this.email, password: this.password });
+
+          this.$router.push("/home");
+        } catch (error) {
+          this.errorMessage = "Invalid email or password.";
+        }
       } else {
         return;
       }

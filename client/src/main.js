@@ -9,4 +9,10 @@ import { createVuetify } from "vuetify";
 
 const vuetify = createVuetify();
 
-createApp(App).use(store).use(vuetify).use(router).mount("#app");
+const app = createApp(App);
+
+app.use(store).use(vuetify).use(router);
+
+store.dispatch("fetchUser");
+
+app.mount("#app");

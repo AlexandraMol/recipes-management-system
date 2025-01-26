@@ -6,7 +6,8 @@
         <span class="app-title">FoodMood</span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn @click="goToLogin" text>Login</v-btn>
+      <v-btn v-if="!isLoggedIn" @click="goToLogin" text>Login</v-btn>
+      <v-btn v-else @click="logoutUser" text>Logout</v-btn>
     </v-app-bar>
     <v-main>
       <router-view></router-view>
@@ -30,14 +31,23 @@ import {
   VFooter,
   VCol,
 } from "vuetify/components";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
   name: "App",
+  computed: {
+    ...mapGetters(["isLoggedIn"]),
+  },
   methods: {
+    ...mapActions(["logout"]),
     goToLogin() {
       this.$router.push("/login");
     },
     goToHomePage() {
+      this.$router.push("/");
+    },
+    async logoutUser() {
+      await this.logout();
       this.$router.push("/");
     },
   },
