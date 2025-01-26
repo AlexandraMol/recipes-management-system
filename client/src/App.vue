@@ -1,30 +1,95 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view/>
+  <v-app>
+    <v-app-bar app color="black" dark>
+      <v-toolbar-title @click="goToHomePage">
+        <span>👨‍🍳</span>
+        <span class="app-title">FoodMood</span>
+      </v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-btn @click="goToLogin" text>Login</v-btn>
+    </v-app-bar>
+    <v-main>
+      <router-view></router-view>
+    </v-main>
+    <v-footer app color="black" dark>
+      <v-col class="text-center white--text"
+        >Made with ❤️ by Alexandra Molnar</v-col
+      >
+    </v-footer>
+  </v-app>
 </template>
 
+<script>
+import {
+  VApp,
+  VAppBar,
+  VToolbarTitle,
+  VSpacer,
+  VBtn,
+  VMain,
+  VFooter,
+  VCol,
+} from "vuetify/components";
+
+export default {
+  name: "App",
+  methods: {
+    goToLogin() {
+      this.$router.push("/login");
+    },
+    goToHomePage() {
+      this.$router.push("/");
+    },
+  },
+  components: {
+    VApp,
+    VAppBar,
+    VToolbarTitle,
+    VSpacer,
+    VBtn,
+    VMain,
+    VFooter,
+    VCol,
+  },
+};
+</script>
+
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+body {
+  margin: 0;
 }
 
-nav {
-  padding: 30px;
+.v-toolbar-title:hover {
+  cursor: pointer;
 }
 
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
+.v-main {
+  background: white;
 }
 
-nav a.router-link-exact-active {
-  color: #42b983;
+.container-auth {
+  display: flex;
+  gap: 3em;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+@media (max-width: 350px) {
+  .app-title {
+    display: none;
+    visibility: hidden;
+  }
+}
+
+.v-form {
+  width: 25%;
+}
+
+@media (max-width: 500px) {
+  .v-form {
+    width: 50%;
+  }
 }
 </style>
