@@ -36,6 +36,8 @@ import {
   VTextField,
   VBtn,
 } from "vuetify/components";
+import axios from "axios";
+
 export default {
   name: "Register",
   components: {
@@ -95,13 +97,24 @@ export default {
     ],
   }),
   methods: {
-    submitRegister() {
+    async submitRegister() {
+      // TODO: treat errors with toasters
       if (this.valid) {
-        alert(
-          `Form data:\nUsername: ${this.username}\nEmail: ${this.email}\nPassword: ${this.password}`
-        );
-        //TODO: route to backend
-        this.$router.push("/login");
+        try {
+          const response = await axios.post(
+            "http://localhost:3000/api/auth/register",
+            {
+              email: this.email,
+              password: this.password,
+              username: this.username,
+            }
+          );
+          if (response.status === 201) {
+            this.$router.push("/login");
+          }
+        } catch (error) {
+          console.log(error);
+        }
       } else {
         return;
       }

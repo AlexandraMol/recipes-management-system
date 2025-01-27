@@ -73,8 +73,7 @@ export default {
     ...mapActions(["login"]),
     async submitLogin() {
       if (this.valid) {
-        alert(`Form data:\nEmail: ${this.email}\nPassword: ${this.password}`);
-        //TODO: refactor when route to backend is done
+        //TODO: Treat errors with toasters
         try {
           await this.login({ email: this.email, password: this.password });
 
