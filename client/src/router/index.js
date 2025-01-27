@@ -1,10 +1,12 @@
 import { createRouter, createWebHistory } from "vue-router";
 import store from "@/store";
-import { auth } from "../firebase";
 import LandingPage from "@/views/LandingPage.vue";
 import Login from "@/views/Login.vue";
 import Register from "@/views/Register.vue";
 import HomePage from "@/views/HomePage.vue";
+import ExplorePage from "@/views/ExplorePage.vue";
+import AddRecipePage from "@/views/AddRecipePage.vue";
+import PageNotFound from "@/views/PageNotFound.vue";
 
 const routes = [
   {
@@ -38,6 +40,22 @@ const routes = [
     name: "Homepage",
     component: HomePage,
     meta: { requiresAuth: true },
+  },
+  {
+    path: "/explore",
+    name: "Explore",
+    component: ExplorePage,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/add-recipe",
+    name: "AddRecipe",
+    component: AddRecipePage,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/:catchAll(.*)",
+    component: PageNotFound,
   },
 ];
 

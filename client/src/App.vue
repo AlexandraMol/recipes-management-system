@@ -1,13 +1,21 @@
 <template>
   <v-app>
+    <!-- TODO: move this code in a separate file -->
     <v-app-bar app color="black" dark>
-      <v-toolbar-title @click="goToHomePage">
+      <v-toolbar-title @click="() => redirect('/')">
         <span>👨‍🍳</span>
         <span class="app-title">FoodMood</span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn v-if="!isLoggedIn" @click="goToLogin" text>Login</v-btn>
-      <v-btn v-else @click="logoutUser" text>Logout</v-btn>
+      <v-btn v-if="!isLoggedIn" @click="() => redirect('/login')" text
+        >Login</v-btn
+      >
+      <template v-else>
+        <!-- TODO: change with icons for phones -->
+        <v-btn @click="() => redirect('/explore')" text>Explore</v-btn>
+        <v-btn @click="() => redirect('add-recipe')" text>Add Recipe</v-btn>
+        <v-btn @click="logoutUser" text>Logout</v-btn>
+      </template>
     </v-app-bar>
     <v-main>
       <router-view></router-view>
@@ -40,11 +48,8 @@ export default {
   },
   methods: {
     ...mapActions(["logout"]),
-    goToLogin() {
-      this.$router.push("/login");
-    },
-    goToHomePage() {
-      this.$router.push("/");
+    redirect(path) {
+      this.$router.push(path);
     },
     async logoutUser() {
       await this.logout();

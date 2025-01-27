@@ -1,7 +1,7 @@
 <template>
   <v-container
     class="d-flex justify-center align-center text-center"
-    style="height: 70vh"
+    style="height: 100%"
   >
     <div class="description">
       <h1 class="text-h3 mb-4">Welcome to our website!</h1>
