@@ -1,50 +1,21 @@
 <template>
-  <div>
-    <!-- TODO: loading component -->
-    <div v-if="loading">Loading...</div>
-    <!-- TODO: Extract this template code to re use at explore -->
-    <div v-else class="recipe-container">
-      <v-card
-        v-for="recipe in recipes"
-        :key="recipe.name"
-        class="mx-auto"
-        max-width="344"
-      >
-        <v-img
-          height="200px"
-          src="https://images.pexels.com/photos/691114/pexels-photo-691114.jpeg?cs=srgb&dl=pexels-dana-tentis-118658-691114.jpg&fm=jpg"
-          cover
-        ></v-img>
-
-        <v-card-title> {{ recipe.name }} </v-card-title>
-
-        <v-card-subtitle>
-          {{ recipe.category.join(", ") }}
-        </v-card-subtitle>
-
-        <v-card-actions>
-          <v-btn color="black" text="Explore"></v-btn>
-          <div>
-            <span class="card-button">🗑️</span>
-            <span class="card-button">✏️</span>
-          </div>
-        </v-card-actions>
-      </v-card>
-    </div>
+  <!-- TODO: loading component -->
+  <div v-if="loading">Loading...</div>
+  <div v-else class="recipe-container">
+    <span class="element" v-for="(recipe, index) in recipes" :key="index">
+      <RecipeCard
+        v-bind:key="recipe.id"
+        :recipe="recipe"
+        :isOwnRecipe="true"
+      ></RecipeCard>
+    </span>
   </div>
 </template>
 
 <script>
 import axios from "axios";
-import {
-  VCard,
-  VImg,
-  VCardTitle,
-  VCardSubtitle,
-  VCardActions,
-  VBtn,
-} from "vuetify/components";
 import { mapGetters } from "vuex";
+import RecipeCard from "@/components/RecipeCard.vue";
 
 export default {
   name: "HomePage",
@@ -55,12 +26,7 @@ export default {
     };
   },
   components: {
-    VCard,
-    VImg,
-    VCardTitle,
-    VCardSubtitle,
-    VCardActions,
-    VBtn,
+    RecipeCard,
   },
   computed: {
     ...mapGetters(["currentUser"]),
@@ -98,29 +64,18 @@ export default {
 </script>
 <style>
 .recipe-container {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 5px;
-  align-items: center;
+  display: grid;
+  gap: 1px;
+  grid-template-columns: repeat(3, 1fr);
 }
 
-.v-card {
-  flex: 1 2 90%;
-  margin: 5px;
+.element {
+  margin: 10px;
 }
 
-.v-card-actions {
-  display: flex;
-  justify-content: space-between;
-}
-
-.card-button {
-  cursor: pointer;
-  padding: 5px;
-}
-
-.card-button:hover {
-  background-color: antiquewhite;
+@media (max-width: 1000px) {
+  .recipe-container {
+    display: block;
+  }
 }
 </style>

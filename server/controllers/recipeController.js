@@ -54,23 +54,26 @@ const getOtherUserRecipes = async (req, res) => {
   try {
     const userRecipes = await db
       .collection("recipes")
-      .where("username", "!=", req.params.username)
+      .where("visibility", "==", "Public")
       .get();
 
-    if (userRecipes.empty) {
+    const filteredRecipes = userRecipes.docs.filter((doc) => {
+      const recipe = doc.data();
+      return recipe.username !== req.params.username;
+    });
+
+    if (filteredRecipes.empty) {
       return res.status(200).json({
         data: [],
       });
     }
 
-    const recipes = userRecipes.docs.map((doc) => ({
+    const recipes = filteredRecipes.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
 
-    return res.status(200).json({
-      data: recipes,
-    });
+    return res.status(200).json({ data: recipes });
   } catch (error) {
     return res.status(400).json({ error: error.message });
   }
