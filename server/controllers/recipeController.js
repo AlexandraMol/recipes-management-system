@@ -79,8 +79,56 @@ const getOtherUserRecipes = async (req, res) => {
   }
 };
 
+const getRecipeById = async (req, res) => {
+  try {
+    const recipe = await db.collection("recipes").doc(req.params.id).get();
+
+    if (!recipe.exists) {
+      return res.status(404).json({ message: "Recipe not found" });
+    }
+
+    return res.status(200).json({ data: recipe.data() });
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
+  }
+};
+
+const remove = async (req, res) => {
+  try {
+    const recipe = await db.collection("recipes").doc(req.params.id);
+
+    if (!recipe.exists) {
+      return res.status(404).json({ message: "Recipe not found" });
+    }
+
+    recipe.delete();
+
+    return res.status(200).json({ message: "Recipe deleted" });
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
+  }
+};
+
+const edit = async (req, res) => {
+  try {
+    const recipe = await db.collection("recipes").doc(req.params.id).get();
+
+    if (!recipe.exists) {
+      return res.status(404).json({ message: "Recipe not found" });
+    }
+    await db.collection("recipes").doc(req.params.id).update(req.body);
+
+    return res.status(200).json({ message: "Recipe updated" });
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
+  }
+};
+
 module.exports = {
   add,
+  edit,
+  remove,
+  getRecipeById,
   getUserRecipes,
   getOtherUserRecipes,
 };
