@@ -95,13 +95,13 @@ const getRecipeById = async (req, res) => {
 
 const remove = async (req, res) => {
   try {
-    const recipe = await db.collection("recipes").doc(req.params.id);
+    const recipe = await db.collection("recipes").doc(req.params.id).get();
 
     if (!recipe.exists) {
       return res.status(404).json({ message: "Recipe not found" });
     }
 
-    recipe.delete();
+    await db.collection("recipes").doc(req.params.id).delete();
 
     return res.status(200).json({ message: "Recipe deleted" });
   } catch (error) {

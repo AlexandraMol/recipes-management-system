@@ -7,6 +7,7 @@ import HomePage from "@/views/HomePage.vue";
 import ExplorePage from "@/views/ExplorePage.vue";
 import AddRecipePage from "@/views/AddRecipePage.vue";
 import PageNotFound from "@/views/PageNotFound.vue";
+import RecipePage from "@/views/RecipePage.vue";
 
 const routes = [
   {
@@ -52,6 +53,11 @@ const routes = [
     name: "AddRecipe",
     component: AddRecipePage,
     meta: { requiresAuth: true },
+  },
+  {
+    path: "/recipe/:id",
+    component: RecipePage,
+    props: true,
   },
   {
     path: "/:catchAll(.*)",

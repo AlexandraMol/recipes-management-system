@@ -13,7 +13,7 @@
       <template v-else>
         <!-- TODO: change with icons for phones -->
         <v-btn @click="() => redirect('/explore')" text>Explore</v-btn>
-        <v-btn @click="() => redirect('add-recipe')" text>Add Recipe</v-btn>
+        <v-btn @click="() => redirect('/add-recipe')" text>Add Recipe</v-btn>
         <v-btn @click="logoutUser" text>Logout</v-btn>
       </template>
     </v-app-bar>
