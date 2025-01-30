@@ -77,9 +77,11 @@
               <v-list-item-content>
                 <v-list-item-title>Step {{ index + 1 }}</v-list-item-title>
                 <v-spacer></v-spacer>
-                <v-list-item-subtitle>{{
-                  step.description
-                }}</v-list-item-subtitle>
+                <v-textarea
+                  v-model="step.description"
+                  rows="4"
+                  >{{
+                }}</v-textarea>
               </v-list-item-content>
             </v-list-item>
           </v-list>
@@ -116,6 +118,7 @@ import {
   VIcon,
   VCardActions,
   VBtn,
+  VTextarea,
 } from "vuetify/components";
 
 import axios from "axios";
@@ -147,6 +150,7 @@ export default {
     VIcon,
     VCardActions,
     VBtn,
+    VTextarea,
   },
   computed: {
     ...mapGetters(["currentUser"]),

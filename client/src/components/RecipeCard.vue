@@ -54,7 +54,9 @@ export default {
     explore() {
       this.$router.push(`/recipe/${this.recipe.id}`);
     },
-    edit() {},
+    edit() {
+      this.$router.push(`/recipe/edit/${this.recipe.id}`);
+    },
     async remove() {
       try {
         const token = await this.currentUser.getIdToken(); // TODO: Sa vad de ce la refresh se pierde userul

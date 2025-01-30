@@ -8,6 +8,7 @@ import ExplorePage from "@/views/ExplorePage.vue";
 import AddRecipePage from "@/views/AddRecipePage.vue";
 import PageNotFound from "@/views/PageNotFound.vue";
 import RecipePage from "@/views/RecipePage.vue";
+import EditRecipePage from "@/views/EditRecipePage.vue";
 
 const routes = [
   {
@@ -58,6 +59,12 @@ const routes = [
     path: "/recipe/:id",
     component: RecipePage,
     props: true,
+  },
+  {
+    path: "/recipe/edit/:id",
+    name: "EditRecipe",
+    component: EditRecipePage,
+    meta: { requiresAuth: true },
   },
   {
     path: "/:catchAll(.*)",

@@ -1,0 +1,58 @@
+<template>
+  <div>
+    <RecipeForm
+      v-if="this.recipe"
+      :existingRecipe="this.recipe"
+      :isEditing="true"
+    />
+    <p v-else>Loading...</p>
+  </div>
+</template>
+
+<script>
+import axios from "axios";
+import RecipeForm from "@/components/RecipeForm.vue";
+import { mapGetters } from "vuex";
+
+export default {
+  components: {
+    RecipeForm,
+  },
+  computed: {
+    ...mapGetters(["currentUser"]),
+  },
+  data() {
+    return {
+      recipe: null,
+    };
+  },
+  mounted() {
+    this.getRecipe();
+  },
+  methods: {
+    async getRecipe() {
+      const recipeId = this.$route.params.id;
+
+      try {
+        const token = await this.currentUser.getIdToken();
+        const response = await axios.get(
+          `http://localhost:3000/api/recipe/recipe/${recipeId}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.status === 200) {
+          this.recipe = response.data.data;
+        }
+      } catch (error) {
+        console.error("Error fetching recipe:", error);
+        this.recipe = null;
+      }
+    },
+  },
+};
+</script>
