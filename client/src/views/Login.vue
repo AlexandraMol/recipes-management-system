@@ -17,7 +17,6 @@
       ></v-text-field>
       <v-btn type="submit" class="mt-2" color="black" block>Submit</v-btn>
     </v-form>
-    <!-- TODO: Add toaster for errors -->
     <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
   </div>
 </template>
@@ -73,7 +72,6 @@ export default {
     ...mapActions(["login"]),
     async submitLogin() {
       if (this.valid) {
-        //TODO: Treat errors with toasters
         try {
           await this.login({ email: this.email, password: this.password });
 

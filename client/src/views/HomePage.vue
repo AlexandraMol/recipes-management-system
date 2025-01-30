@@ -1,5 +1,4 @@
 <template>
-  <!-- TODO: loading component -->
   <div v-if="loading">Loading...</div>
   <div v-else class="recipe-container">
     <span class="element" v-for="(recipe, index) in recipes" :key="index">
@@ -39,7 +38,7 @@ export default {
   methods: {
     async getRecipes() {
       try {
-        const token = await this.currentUser.getIdToken(); // TODO: Sa vad de ce la refresh se pierde userul
+        const token = await this.currentUser.getIdToken();
         const response = await axios.get(
           `http://localhost:3000/api/recipe/${this.currentUser.displayName}`,
           {

@@ -161,7 +161,7 @@ export default {
   methods: {
     async getRecipe() {
       try {
-        const token = await this.currentUser.getIdToken(); // TODO: Sa vad de ce la refresh se pierde userul
+        const token = await this.currentUser.getIdToken();
         const response = await axios.get(
           `http://localhost:3000/api/recipe/recipe/${this.id}`,
           {

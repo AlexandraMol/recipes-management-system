@@ -4,15 +4,15 @@
     style="height: 100%"
   >
     <div class="description">
-      <h1 class="text-h3 mb-4">Welcome to our website!</h1>
+      <h1 class="text-h3 font-weight-bold mb-4">Welcome to FoodMood!</h1>
       <p class="text-h6">
-        <b>FoodMood</b> is the perfect app for food lovers, chefs, and home
-        cooks alike. It's your go-to platform when you want to store, share and
-        explore from around the world.
+        This is the perfect app for food lovers, chefs, and home cooks alike.
+        It's your go-to platform when you want to store, share and explore from
+        around the world.
       </p>
       <p class="text-h6">Join the FoodMood Community Today!</p>
       <v-btn @click="goToRegister" class="register-button" color="black" large
-        >Register</v-btn
+        >Get started</v-btn
       >
     </div>
   </v-container>

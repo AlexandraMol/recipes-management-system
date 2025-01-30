@@ -1,11 +1,10 @@
-<!-- TODO: Responsive for phones and treat errors -->
 <template>
   <div class="container-add-recipe">
     <h1 class="recipe-header">
       {{ isEditing ? "Edit Recipe" : "Create Recipe" }}
     </h1>
 
-    <v-form v-model="valid" @submit.prevent="submitForm">
+    <v-form class="recipe-form" v-model="valid" @submit.prevent="submitForm">
       <v-container>
         <h3>General Information:</h3>
         <div class="row">
@@ -201,7 +200,7 @@ export default {
 .recipe-header {
   margin-top: 1em;
 }
-.v-form {
+.recipe-form {
   width: 50%;
   align-items: center;
   display: flex;
@@ -220,5 +219,11 @@ export default {
 .row {
   display: flex;
   gap: 10px;
+}
+
+@media (max-width: 900px) {
+  .recipe-form {
+    width: 100%;
+  }
 }
 </style>

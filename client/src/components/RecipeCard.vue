@@ -59,7 +59,7 @@ export default {
     },
     async remove() {
       try {
-        const token = await this.currentUser.getIdToken(); // TODO: Sa vad de ce la refresh se pierde userul
+        const token = await this.currentUser.getIdToken();
         const response = await axios.delete(
           `http://localhost:3000/api/recipe/remove/${this.recipe.id}`,
           {
