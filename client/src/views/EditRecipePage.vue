@@ -5,7 +5,7 @@
       :existingRecipe="this.recipe"
       :isEditing="true"
     />
-    <p v-else>Loading...</p>
+    <Loading v-else></Loading>
   </div>
 </template>
 
@@ -13,10 +13,12 @@
 import axios from "axios";
 import RecipeForm from "@/components/RecipeForm.vue";
 import { mapGetters } from "vuex";
+import Loading from "@/components/Loading.vue";
 
 export default {
   components: {
     RecipeForm,
+    Loading,
   },
   computed: {
     ...mapGetters(["currentUser"]),
@@ -24,6 +26,7 @@ export default {
   data() {
     return {
       recipe: null,
+      loading: true,
     };
   },
   mounted() {
@@ -51,6 +54,8 @@ export default {
       } catch (error) {
         console.error("Error fetching recipe:", error);
         this.recipe = null;
+      } finally {
+        this.loading = false;
       }
     },
   },

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="loading">Loading...</div>
+  <Loading v-if="loading"></Loading>
   <div v-else class="recipe-container">
     <span class="element" v-for="(recipe, index) in recipes" :key="index">
       <RecipeCard
@@ -14,6 +14,7 @@
 import RecipeCard from "@/components/RecipeCard.vue";
 import axios from "axios";
 import { mapGetters } from "vuex";
+import Loading from "@/components/Loading.vue";
 
 export default {
   name: "Explore",
@@ -25,6 +26,7 @@ export default {
   },
   components: {
     RecipeCard,
+    Loading,
   },
 
   computed: {

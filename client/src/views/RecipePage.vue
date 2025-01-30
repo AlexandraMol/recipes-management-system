@@ -125,7 +125,7 @@ import axios from "axios";
 import { mapGetters } from "vuex";
 export default {
   name: "RecipePage",
-  props: ["id"], // Receive ID from route
+  props: ["id"],
   data() {
     return {
       recipe: {},
