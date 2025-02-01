@@ -1,5 +1,6 @@
 <template>
   <div class="container-auth">
+    <Toaster ref="toaster" />
     <h1>Login Form</h1>
     <v-form v-model="valid" @submit.prevent="submitLogin">
       <v-text-field
@@ -17,7 +18,6 @@
       ></v-text-field>
       <v-btn type="submit" class="mt-2" color="black" block>Submit</v-btn>
     </v-form>
-    <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
   </div>
 </template>
 
@@ -31,6 +31,7 @@ import {
   VBtn,
 } from "vuetify/components";
 import { mapGetters, mapActions } from "vuex";
+import Toaster from "@/components/Toaster.vue";
 
 export default {
   name: "Register",
@@ -41,10 +42,10 @@ export default {
     VCol,
     VTextField,
     VBtn,
+    Toaster,
   },
   data: () => ({
     valid: false,
-    errorMessage: "",
     email: "",
     emailRules: [
       (value) => {
@@ -52,6 +53,12 @@ export default {
           return true;
         }
         return "E-mail is required.";
+      },
+      (value) => {
+        if (/.+@.+\..+/.test(value)) {
+          return true;
+        }
+        return "E-mail must be valid.";
       },
     ],
     password: "",
@@ -77,7 +84,7 @@ export default {
 
           this.$router.push("/home");
         } catch (error) {
-          this.errorMessage = "Invalid email or password.";
+          this.$refs.toaster.showToast("Invalid email or password.");
         }
       } else {
         return;

@@ -1,5 +1,6 @@
 <template>
   <div class="container-add-recipe">
+    <Toaster ref="toaster" />
     <h1 class="recipe-header">
       {{ isEditing ? "Edit Recipe" : "Create Recipe" }}
     </h1>
@@ -110,6 +111,7 @@ import {
 } from "vuetify/components";
 import axios from "axios";
 import { mapGetters } from "vuex";
+import Toaster from "@/components/Toaster.vue";
 
 export default {
   props: {
@@ -124,6 +126,7 @@ export default {
     VBtn,
     VTextarea,
     VList,
+    Toaster,
   },
   computed: {
     ...mapGetters(["currentUser"]),
@@ -188,7 +191,9 @@ export default {
           }
           this.$router.push("/home");
         } catch (error) {
-          console.log(error);
+          this.$refs.toaster.showToast(
+            error?.response?.data?.error || error.message
+          );
         }
       }
     },

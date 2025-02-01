@@ -1,5 +1,6 @@
 <template>
   <div class="container-auth">
+    <Toaster ref="toaster" />
     <h1>Register Form</h1>
     <v-form v-model="valid" @submit.prevent="submitRegister">
       <v-text-field
@@ -36,6 +37,7 @@ import {
   VTextField,
   VBtn,
 } from "vuetify/components";
+import Toaster from "@/components/Toaster.vue";
 import axios from "axios";
 
 export default {
@@ -47,6 +49,7 @@ export default {
     VCol,
     VTextField,
     VBtn,
+    Toaster,
   },
   data: () => ({
     valid: false,
@@ -114,6 +117,9 @@ export default {
           }
         } catch (error) {
           console.log(error);
+          this.$refs.toaster.showToast(
+            error?.response?.data?.error || error.message
+          );
         }
       } else {
         return;

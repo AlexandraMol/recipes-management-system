@@ -52,7 +52,7 @@ export default {
           this.recipe = response.data.data;
         }
       } catch (error) {
-        console.error("Error fetching recipe:", error);
+        console.log(error.message);
         this.recipe = null;
       } finally {
         this.loading = false;

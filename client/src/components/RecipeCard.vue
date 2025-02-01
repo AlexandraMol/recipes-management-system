@@ -56,7 +56,7 @@ export default {
     async remove() {
       try {
         const token = await this.currentUser.getIdToken();
-        const response = await axios.delete(
+        await axios.delete(
           `http://localhost:3000/api/recipe/remove/${this.recipe.id}`,
           {
             headers: {
