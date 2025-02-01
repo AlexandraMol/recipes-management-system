@@ -24,6 +24,17 @@
           <v-icon>mdi-plus-box</v-icon>
         </v-btn>
 
+        <v-btn
+          @click="() => redirect('/generate-shopping-list')"
+          text
+          v-if="!isMobile"
+        >
+          Shopping List
+        </v-btn>
+        <v-btn @click="() => redirect('/generate-shopping-list')" icon v-else>
+          <v-icon>mdi-text-box-check-outline</v-icon>
+        </v-btn>
+
         <v-btn @click="logoutUser" text v-if="!isMobile"> Logout </v-btn>
         <v-btn @click="logoutUser" icon v-else>
           <v-icon>mdi-logout</v-icon>

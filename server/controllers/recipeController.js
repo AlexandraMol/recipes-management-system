@@ -124,6 +124,50 @@ const edit = async (req, res) => {
   }
 };
 
+const generateShoppingList = async (req, res) => {
+  try {
+    const { recipeIds } = req.body;
+
+    if (!recipeIds || recipeIds.length === 0) {
+      return res.status(400).json({ message: "Missing recipes" });
+    }
+
+    let ingredientsToBuy = {};
+
+    for (const recipeId of recipeIds) {
+      const recipe = await db.collection("recipes").doc(recipeId).get();
+
+      if (!recipe.exists) {
+        continue;
+      }
+
+      const { ingredients } = recipe.data();
+
+      ingredients.forEach(({ name, quantity }) => {
+        const formattedName = name.toLowerCase();
+        const formattedQuantity = parseInt(quantity) || 0;
+
+        if (ingredientsToBuy[formattedName]) {
+          ingredientsToBuy[formattedName] += formattedQuantity;
+        } else {
+          ingredientsToBuy[formattedName] = formattedQuantity;
+        }
+      });
+    }
+
+    const shoppingList = Object.entries(ingredientsToBuy).map(
+      ([name, quantity]) => ({
+        name,
+        quantity: quantity,
+      })
+    );
+
+    res.status(200).json({ data: shoppingList });
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
+  }
+};
+
 module.exports = {
   add,
   edit,
@@ -131,4 +175,5 @@ module.exports = {
   getRecipeById,
   getUserRecipes,
   getOtherUserRecipes,
+  generateShoppingList,
 };

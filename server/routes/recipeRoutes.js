@@ -12,5 +12,6 @@ router.get(
   authorize,
   RecipeController.getOtherUserRecipes
 );
+router.post("/shopping-list", authorize, RecipeController.generateShoppingList);
 
 module.exports = router;

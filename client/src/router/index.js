@@ -9,6 +9,7 @@ import AddRecipePage from "@/views/AddRecipePage.vue";
 import PageNotFound from "@/views/PageNotFound.vue";
 import RecipePage from "@/views/RecipePage.vue";
 import EditRecipePage from "@/views/EditRecipePage.vue";
+import GenerateListPage from "@/views/GenerateListPage.vue";
 
 const routes = [
   {
@@ -64,6 +65,12 @@ const routes = [
     path: "/recipe/edit/:id",
     name: "EditRecipe",
     component: EditRecipePage,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/generate-shopping-list",
+    name: "GenerateShoppingList",
+    component: GenerateListPage,
     meta: { requiresAuth: true },
   },
   {
