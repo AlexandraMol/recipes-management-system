@@ -5,7 +5,7 @@
         <v-card class="mx-auto pa-5" elevation="6">
           <v-img
             height="250px"
-            src="https://images.pexels.com/photos/691114/pexels-photo-691114.jpeg"
+            src="https://i.imgur.com/fEJIcPf.png"
             cover
             class="mb-3"
           ></v-img>
@@ -80,6 +80,7 @@
                 <v-textarea
                   v-model="step.description"
                   rows="4"
+                  readonly="true"
                   >{{
                 }}</v-textarea>
               </v-list-item-content>

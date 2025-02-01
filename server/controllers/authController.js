@@ -1,5 +1,4 @@
 const { db, auth } = require("../firebase/firebase");
-//TODO: extract the logic in a service file
 const register = async (req, res) => {
   const { email, password, username } = req.body;
 

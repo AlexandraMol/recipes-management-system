@@ -1,10 +1,6 @@
 <template>
   <v-card :key="recipe.id" class="mx-auto" max-width="344">
-    <v-img
-      height="200px"
-      src="https://images.pexels.com/photos/691114/pexels-photo-691114.jpeg"
-      cover
-    ></v-img>
+    <v-img height="200px" src="https://i.imgur.com/fEJIcPf.png" cover></v-img>
 
     <v-card-title> {{ recipe.name }} </v-card-title>
     <v-card-subtitle> {{ recipe?.category?.join(", ") }} </v-card-subtitle>
@@ -78,6 +74,9 @@ export default {
 </script>
 
 <style>
+.v-card {
+  border: 1px solid black;
+}
 .v-card-actions {
   display: flex;
   justify-content: space-between;
