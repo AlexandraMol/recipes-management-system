@@ -101,7 +101,6 @@ export default {
   }),
   methods: {
     async submitRegister() {
-      // TODO: treat errors with toasters
       if (this.valid) {
         try {
           const response = await axios.post(

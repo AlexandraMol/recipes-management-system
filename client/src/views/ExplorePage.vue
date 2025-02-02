@@ -1,13 +1,20 @@
 <template>
   <Loading v-if="loading"></Loading>
-  <div v-else class="recipe-container">
-    <span class="element" v-for="(recipe, index) in recipes" :key="index">
-      <RecipeCard
-        v-bind:key="recipe.id"
-        :recipe="recipe"
-        :isOwnRecipe="false"
-      ></RecipeCard>
-    </span>
+  <div v-else>
+    <Filters />
+    <div class="recipe-container">
+      <span
+        class="element"
+        v-for="(recipe, index) in filteredRecipes"
+        :key="index"
+      >
+        <RecipeCard
+          v-bind:key="recipe.id"
+          :recipe="recipe"
+          :isOwnRecipe="false"
+        ></RecipeCard>
+      </span>
+    </div>
   </div>
 </template>
 <script>
@@ -15,6 +22,7 @@ import RecipeCard from "@/components/RecipeCard.vue";
 import axios from "axios";
 import { mapGetters } from "vuex";
 import Loading from "@/components/Loading.vue";
+import Filters from "@/components/Filters.vue";
 
 export default {
   name: "Explore",
@@ -27,10 +35,20 @@ export default {
   components: {
     RecipeCard,
     Loading,
+    Filters,
   },
 
   computed: {
-    ...mapGetters(["currentUser"]),
+    ...mapGetters(["currentUser", "getSelectedFilters"]),
+    filteredRecipes() {
+      return this.getSelectedFilters.length
+        ? this.recipes.filter((recipe) =>
+            this.getSelectedFilters.every((filter) =>
+              recipe.category.includes(filter)
+            )
+          )
+        : this.recipes;
+    },
   },
 
   mounted() {

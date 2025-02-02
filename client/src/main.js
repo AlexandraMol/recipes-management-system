@@ -13,6 +13,6 @@ const app = createApp(App);
 
 app.use(store).use(vuetify).use(router);
 
-store.dispatch("fetchUser");
+store.dispatch("getUser");
 
 app.mount("#app");

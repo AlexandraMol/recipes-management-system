@@ -9,10 +9,12 @@ import {
 export default createStore({
   state: {
     user: JSON.parse(localStorage.getItem("user")) || null, //TODO: refactor so that user is not saved in local storage
+    selectedFilters: [],
   },
   getters: {
     isLoggedIn: (state) => !!state.user,
     currentUser: (state) => state.user,
+    getSelectedFilters: (state) => state.selectedFilters || [],
   },
   mutations: {
     SET_USER(state, user) {
@@ -22,6 +24,9 @@ export default createStore({
     CLEAR_USER(state) {
       state.user = null;
       localStorage.removeItem("user");
+    },
+    SET_FILTERS(state, filters) {
+      state.selectedFilters = filters;
     },
   },
   actions: {
@@ -47,7 +52,7 @@ export default createStore({
         throw error;
       }
     },
-    fetchUser({ commit }) {
+    getUser({ commit }) {
       onAuthStateChanged(auth, (user) => {
         if (user) {
           commit("SET_USER", user);
@@ -55,6 +60,9 @@ export default createStore({
           commit("CLEAR_USER");
         }
       });
+    },
+    updateFilters({ commit }, filters) {
+      commit("SET_FILTERS", filters);
     },
   },
   modules: {},
