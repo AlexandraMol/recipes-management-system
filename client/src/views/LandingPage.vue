@@ -3,31 +3,43 @@
     class="d-flex justify-center align-center text-center"
     style="height: 100%"
   >
+    <v-img width="100px" src="background/chef.png"></v-img>
     <div class="description">
-      <h1 class="text-h3 font-weight-bold mb-4">Welcome to FoodMood!</h1>
+      <h1 class="text-h3 font-weight-bold mb-4">
+        The recipe app for every home chef!
+      </h1>
       <p class="text-h6">
-        This is the perfect app for food lovers, chefs, and home cooks alike.
-        It's your go-to platform when you want to store, share and explore from
-        around the world.
+        Find delicious recipes, cook with confidence, and share your creations -
+        all in one app!
       </p>
-      <p class="text-h6">Join the FoodMood Community Today!</p>
-      <v-btn @click="goToRegister" class="register-button" color="black" large
-        >Get started</v-btn
+      <v-container
+        class="buttons-area d-flex justify-center align-center text-center"
       >
+        <v-btn @click="goToRegister" class="button" color="black" large
+          >Sign up</v-btn
+        >
+        <v-btn @click="goToLogin" class="button" color="white" large
+          >Log in</v-btn
+        >
+      </v-container>
     </div>
   </v-container>
 </template>
 <script>
-import { VBtn, VContainer } from "vuetify/components";
+import { VBtn, VContainer, VImg } from "vuetify/components";
 export default {
   name: "LandingPage",
   components: {
     VBtn,
     VContainer,
+    VImg,
   },
   methods: {
     goToRegister() {
       this.$router.push("/register");
+    },
+    goToLogin() {
+      this.$router.push("/login");
     },
   },
 };
@@ -42,7 +54,15 @@ export default {
   gap: 2rem;
 }
 
-.register-button {
+.buttons-area {
+  gap: 20px;
+}
+
+.button {
   width: 200px;
+}
+
+.button:hover {
+  transform: scale(1.05) perspective(1px);
 }
 </style>

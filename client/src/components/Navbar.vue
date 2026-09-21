@@ -1,8 +1,7 @@
 <template>
   <v-app-bar app color="black" dark>
     <v-toolbar-title @click="() => redirect('/')">
-      <span>👨‍🍳</span>
-      <span class="app-title">FoodMood</span>
+      <v-img width="100px" src="logos/logo_black.png" cover></v-img>
     </v-toolbar-title>
     <v-spacer></v-spacer>
     <v-btn v-if="!isLoggedIn" @click="() => redirect('/login')" text
@@ -35,6 +34,13 @@
           <v-icon>mdi-text-box-check-outline</v-icon>
         </v-btn>
 
+        <v-btn @click="() => redirect('/profile')" text v-if="!isMobile">
+          Profile
+        </v-btn>
+        <v-btn @click="() => redirect('/profile')" icon v-else>
+          <v-icon>mdi-account</v-icon>
+        </v-btn>
+
         <v-btn @click="logoutUser" text v-if="!isMobile"> Logout </v-btn>
         <v-btn @click="logoutUser" icon v-else>
           <v-icon>mdi-logout</v-icon>
@@ -51,6 +57,7 @@ import {
   VSpacer,
   VBtn,
   VIcon,
+  VImg,
 } from "vuetify/components";
 import { mapGetters, mapActions } from "vuex";
 
@@ -90,6 +97,7 @@ export default {
     VSpacer,
     VBtn,
     VIcon,
+    VImg,
   },
 };
 </script>

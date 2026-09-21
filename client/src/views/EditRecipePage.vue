@@ -39,13 +39,13 @@ export default {
       try {
         const token = await this.currentUser.getIdToken();
         const response = await axios.get(
-          `http://localhost:3000/api/recipe/recipe/${recipeId}`,
+          `http://localhost:5000/api/recipe/recipe/${recipeId}`,
           {
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
 
         if (response.status === 200) {

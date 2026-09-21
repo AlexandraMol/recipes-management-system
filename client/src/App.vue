@@ -5,9 +5,7 @@
       <router-view></router-view>
     </v-main>
     <v-footer app color="black" dark>
-      <v-col class="text-center white--text"
-        >Made with ❤️ by Alexandra Molnar</v-col
-      >
+      <v-col class="text-center white--text"></v-col>
     </v-footer>
   </v-app>
 </template>
@@ -34,7 +32,13 @@ body {
 }
 
 .v-main {
+  /* background: url("../public/background/landing.jpg"); */
   background: white;
+  background-size: cover;
+}
+
+.v-btn:hover {
+  transform: scale(1.05) perspective(1px);
 }
 
 .container-auth {

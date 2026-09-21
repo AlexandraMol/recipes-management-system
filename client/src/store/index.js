@@ -8,7 +8,7 @@ import {
 
 export default createStore({
   state: {
-    user: JSON.parse(localStorage.getItem("user")) || null, //TODO: refactor so that user is not saved in local storage
+    user: JSON.parse(localStorage.getItem("user")) || null,
     selectedFilters: [],
   },
   getters: {

@@ -10,6 +10,8 @@ import PageNotFound from "@/views/PageNotFound.vue";
 import RecipePage from "@/views/RecipePage.vue";
 import EditRecipePage from "@/views/EditRecipePage.vue";
 import GenerateListPage from "@/views/GenerateListPage.vue";
+import ProfilePage from "@/views/ProfilePage.vue";
+import AdminDashboard from "@/views/AdminDashboard.vue";
 
 const routes = [
   {
@@ -72,6 +74,16 @@ const routes = [
     name: "GenerateShoppingList",
     component: GenerateListPage,
     meta: { requiresAuth: true },
+  },
+  {
+    path: "/profile",
+    name: "Profile",
+    component: ProfilePage,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/admin",
+    component: AdminDashboard,
   },
   {
     path: "/:catchAll(.*)",

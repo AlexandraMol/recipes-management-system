@@ -1,19 +1,21 @@
 <template>
   <Loading v-if="loading"></Loading>
   <div v-else>
-    <Filters />
     <div class="recipe-container">
-      <span
-        class="element"
-        v-for="(recipe, index) in filteredRecipes"
-        :key="index"
-      >
-        <RecipeCard
-          v-bind:key="recipe.id"
-          :recipe="recipe"
-          :isOwnRecipe="false"
-        ></RecipeCard>
-      </span>
+      <SearchBar class="searchbar"></SearchBar>
+      <div class="recipes">
+        <span
+          class="element"
+          v-for="(recipe, index) in filteredRecipes"
+          :key="index"
+        >
+          <RecipeCard
+            v-bind:key="recipe.id"
+            :recipe="recipe"
+            :isOwnRecipe="false"
+          ></RecipeCard>
+        </span>
+      </div>
     </div>
   </div>
 </template>
@@ -22,7 +24,7 @@ import RecipeCard from "@/components/RecipeCard.vue";
 import axios from "axios";
 import { mapGetters } from "vuex";
 import Loading from "@/components/Loading.vue";
-import Filters from "@/components/Filters.vue";
+import SearchBar from "@/components/SearchBar.vue";
 
 export default {
   name: "Explore",
@@ -35,7 +37,7 @@ export default {
   components: {
     RecipeCard,
     Loading,
-    Filters,
+    SearchBar,
   },
 
   computed: {
@@ -44,8 +46,8 @@ export default {
       return this.getSelectedFilters.length
         ? this.recipes.filter((recipe) =>
             this.getSelectedFilters.every((filter) =>
-              recipe.category.includes(filter)
-            )
+              recipe.category.includes(filter),
+            ),
           )
         : this.recipes;
     },
@@ -60,13 +62,13 @@ export default {
       const token = await this.currentUser.getIdToken();
       try {
         const response = await axios.get(
-          `http://localhost:3000/api/recipe/otherRecipes/${this.currentUser.displayName}`,
+          `http://localhost:5000/api/recipe/otherRecipes/${this.currentUser.displayName}`,
           {
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
         if (response.status === 200) {
           console.log(response);
@@ -81,3 +83,22 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.recipe-container {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  gap: 1em;
+  margin: 24px;
+}
+
+.searchbar {
+  align-self: center;
+}
+
+.recipes {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+</style>

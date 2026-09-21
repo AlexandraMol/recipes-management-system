@@ -104,12 +104,12 @@ export default {
       if (this.valid) {
         try {
           const response = await axios.post(
-            "http://localhost:3000/api/auth/register",
+            "http://localhost:5000/api/auth/register",
             {
               email: this.email,
               password: this.password,
               username: this.username,
-            }
+            },
           );
           if (response.status === 201) {
             this.$router.push("/login");
@@ -117,7 +117,7 @@ export default {
         } catch (error) {
           console.log(error);
           this.$refs.toaster.showToast(
-            error?.response?.data?.error || error.message
+            error?.response?.data?.error || error.message,
           );
         }
       } else {

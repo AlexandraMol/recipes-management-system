@@ -1,0 +1,5 @@
+firebase-token.json
+.env
+.venv
+__pycache__
+serviceAccountKey.json

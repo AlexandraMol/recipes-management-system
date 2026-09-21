@@ -1,6 +1,6 @@
 <template>
   <v-card :key="recipe.id" class="mx-auto" max-width="344">
-    <v-img height="200px" src="https://i.imgur.com/fEJIcPf.png" cover></v-img>
+    <v-img height="200px" :src="recipe.imageUrl" cover></v-img>
 
     <v-card-title> {{ recipe.name }} </v-card-title>
     <v-card-subtitle> {{ recipe?.category?.join(", ") }} </v-card-subtitle>
@@ -10,6 +10,13 @@
       <div v-if="isOwnRecipe">
         <DeleteDialog @confirmDelete="remove" />
         <span class="card-button" @click="edit">✏️</span>
+      </div>
+      <div v-else>
+        <span
+          >{{ recipe?.averageRating || 0 }} ⭐ ({{
+            recipe?.numberOfRatings || 0
+          }}</span
+        >)
       </div>
     </v-card-actions>
   </v-card>
@@ -46,6 +53,7 @@ export default {
   computed: {
     ...mapGetters(["currentUser"]),
   },
+  emits: ["recipe-deleted"],
   methods: {
     explore() {
       this.$router.push(`/recipe/${this.recipe.id}`);
@@ -56,15 +64,18 @@ export default {
     async remove() {
       try {
         const token = await this.currentUser.getIdToken();
+
         await axios.delete(
-          `http://localhost:3000/api/recipe/remove/${this.recipe.id}`,
+          `http://localhost:5000/api/recipe/remove/${this.recipe.id}`,
           {
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
+
+        this.$emit("recipe-deleted", this.recipe.id);
       } catch (error) {
         console.log(error);
       }
