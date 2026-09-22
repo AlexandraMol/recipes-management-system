@@ -40,8 +40,16 @@
         </v-btn>
       </div>
 
-      <MyRecipesSection
+      <RecipeCollection
         :recipes="recipes"
+        :isOwnRecipe="true"
+        search-label="Search your recipes"
+        empty-title="No recipes found"
+        empty-text="Try changing your search filters or add a new recipe."
+        icon="mdi-food-fork-drink"
+        empty-action-text="Add recipe"
+        empty-action-icon="mdi-plus"
+        empty-action-route="/add-recipe"
         @recipe-deleted="removeRecipeFromList"
       />
     </section>
@@ -53,8 +61,7 @@
           <p>Recipes you saved from the platform.</p>
         </div>
       </div>
-
-      <ProfileRecipeSection
+      <RecipeCollection
         :recipes="favoriteRecipes"
         empty-title="No favorite recipes yet"
         empty-text="Explore recipes and save your favorites here."
@@ -70,7 +77,7 @@
         </div>
       </div>
 
-      <ProfileRecipeSection
+      <RecipeCollection
         :recipes="recentlyViewedRecipes"
         empty-title="No recently viewed recipes yet"
         empty-text="Open recipes from Explore and they will appear here."
@@ -84,8 +91,7 @@
 import { mapGetters } from "vuex";
 import { VBtn, VIcon } from "vuetify/components";
 import ExcludedIngredients from "@/components/profile/ExcludedIngredients.vue";
-import MyRecipesSection from "@/components/profile/MyRecipesSection.vue";
-import ProfileRecipeSection from "@/components/profile/ProfileRecipeSection.vue";
+import RecipeCollection from "@/components/recipes/RecipeCollection.vue";
 import axios from "axios";
 
 export default {
@@ -95,8 +101,7 @@ export default {
     VBtn,
     VIcon,
     ExcludedIngredients,
-    MyRecipesSection,
-    ProfileRecipeSection,
+    RecipeCollection,
   },
 
   data() {
@@ -199,12 +204,6 @@ export default {
 
 <style scoped>
 .profile-page {
-  --color-primary: #c23000;
-  --color-secondary: #fcb10a;
-  --color-blue: #14235e;
-  --color-light: #f7f2ed;
-  --color-dark: #0a0b0f;
-
   min-height: 100vh;
   padding: 42px 7vw;
   background: var(--color-light);

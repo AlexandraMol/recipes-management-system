@@ -13,6 +13,7 @@
 <script>
 import { VApp, VMain, VFooter, VCol } from "vuetify/components";
 import Navbar from "@/components/Navbar.vue";
+import "@/assets/main.css";
 
 export default {
   name: "App",
@@ -25,28 +26,3 @@ export default {
   },
 };
 </script>
-
-<style>
-body {
-  margin: 0;
-}
-
-.v-main {
-  /* background: url("../public/background/landing.jpg"); */
-  background: white;
-  background-size: cover;
-}
-
-.v-btn:hover {
-  transform: scale(1.05) perspective(1px);
-}
-
-.container-auth {
-  display: flex;
-  gap: 3em;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-}
-</style>

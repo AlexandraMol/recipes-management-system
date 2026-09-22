@@ -1,9 +1,10 @@
 <template>
-  <div class="profile-recipe-section">
-    <div class="toolbar">
+  <div class="recipes-section">
+    <!-- Filters -->
+    <div v-if="showFilters" class="recipe-toolbar">
       <v-text-field
         v-model="search"
-        label="Search your recipes"
+        :label="searchLabel"
         prepend-inner-icon="mdi-magnify"
         variant="outlined"
         density="comfortable"
@@ -30,24 +31,37 @@
         clearable
       />
     </div>
+
+    <!-- Recipes -->
     <div v-if="filteredRecipes.length" class="recipes-grid">
       <RecipeCard
-        v-for="recipe in recipes"
+        v-for="recipe in filteredRecipes"
         :key="recipe.id"
         :recipe="recipe"
-        :isOwnRecipe="false"
+        :isOwnRecipe="isOwnRecipe"
+        @recipe-deleted="handleRecipeDeleted"
       />
     </div>
 
+    <!-- Empty state -->
     <div v-else class="empty-state">
-      <v-icon size="42">{{ icon }}</v-icon>
+      <v-icon size="42">
+        {{ icon }}
+      </v-icon>
 
       <h3>{{ emptyTitle }}</h3>
       <p>{{ emptyText }}</p>
 
-      <v-btn class="primary-btn" @click="$router.push('/explore')">
-        <v-icon start>mdi-compass-outline</v-icon>
-        Explore recipes
+      <v-btn
+        v-if="showEmptyAction"
+        class="primary-btn"
+        @click="$router.push(emptyActionRoute)"
+      >
+        <v-icon start>
+          {{ emptyActionIcon }}
+        </v-icon>
+
+        {{ emptyActionText }}
       </v-btn>
     </div>
   </div>
@@ -55,10 +69,11 @@
 
 <script>
 import { VTextField, VSelect, VBtn, VIcon } from "vuetify/components";
+
 import RecipeCard from "@/components/RecipeCard.vue";
 
 export default {
-  name: "ProfileRecipeSection",
+  name: "RecipeCollection",
 
   components: {
     RecipeCard,
@@ -68,12 +83,73 @@ export default {
     VIcon,
   },
 
+  emits: ["recipe-deleted"],
+
+  props: {
+    recipes: {
+      type: Array,
+      default: () => [],
+    },
+
+    isOwnRecipe: {
+      type: Boolean,
+      default: false,
+    },
+
+    showFilters: {
+      type: Boolean,
+      default: true,
+    },
+
+    searchLabel: {
+      type: String,
+      default: "Search recipes",
+    },
+
+    emptyTitle: {
+      type: String,
+      default: "No recipes found",
+    },
+
+    emptyText: {
+      type: String,
+      default: "Try changing your filters.",
+    },
+
+    icon: {
+      type: String,
+      default: "mdi-food-fork-drink",
+    },
+
+    showEmptyAction: {
+      type: Boolean,
+      default: true,
+    },
+
+    emptyActionText: {
+      type: String,
+      default: "Explore recipes",
+    },
+
+    emptyActionIcon: {
+      type: String,
+      default: "mdi-compass-outline",
+    },
+
+    emptyActionRoute: {
+      type: String,
+      default: "/explore",
+    },
+  },
+
   data() {
     return {
       search: "",
       selectedCategory: null,
       selectedDifficulty: null,
+
       categories: ["Breakfast", "Lunch", "Dinner", "Snack", "Dessert"],
+
       difficulties: ["Easy", "Medium", "Hard"],
     };
   },
@@ -98,80 +174,20 @@ export default {
     },
   },
 
-  props: {
-    recipes: {
-      type: Array,
-      default: () => [],
-    },
-    emptyTitle: {
-      type: String,
-      default: "No recipes yet",
-    },
-    emptyText: {
-      type: String,
-      default: "Explore recipes and save the ones you like.",
-    },
-    icon: {
-      type: String,
-      default: "mdi-food-fork-drink",
+  methods: {
+    handleRecipeDeleted(recipeId) {
+      if (this.isOwnRecipe) {
+        this.$emit("recipe-deleted", recipeId);
+      }
     },
   },
 };
 </script>
 
 <style scoped>
-.profile-recipe-section {
-  width: 100%;
-}
-
-.recipes-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 18px;
-}
-
-.empty-state {
-  border: 1px dashed #d9c8b8;
-  border-radius: 20px;
-  padding: 34px;
-  text-align: center;
-  background: #fffaf5;
-  color: #756d66;
-}
-
-.empty-state h3 {
-  color: #14235e;
-  margin-top: 10px;
-  font-weight: 900;
-}
-
-.empty-state p {
-  margin: 8px 0 18px;
-}
-
-.toolbar {
-  display: grid;
-  grid-template-columns: 1.4fr 1fr 1fr;
-  gap: 14px;
-}
-
-.primary-btn {
-  background: #c23000 !important;
-  color: white !important;
-  border-radius: 999px;
-  font-weight: 800;
-}
-
-@media (max-width: 1100px) {
-  .recipes-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 650px) {
-  .toolbar,
-  .recipes-grid {
-    grid-template-columns: 1fr;
-  }
+.recipes-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 </style>

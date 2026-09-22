@@ -3,7 +3,7 @@
   <div v-else>
     <div class="recipe-container">
       <SearchBar class="searchbar"></SearchBar>
-      <div class="recipes">
+      <div class="recipes-grid">
         <span
           class="element"
           v-for="(recipe, index) in filteredRecipes"
@@ -95,10 +95,5 @@ export default {
 
 .searchbar {
   align-self: center;
-}
-
-.recipes {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
 }
 </style>

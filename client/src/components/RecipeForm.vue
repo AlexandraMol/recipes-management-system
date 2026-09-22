@@ -12,7 +12,7 @@
           </p>
         </div>
 
-        <v-chip color="black" text-color="white">
+        <v-chip class="privacy-toggle">
           {{ recipe.visibility || "Private" }}
         </v-chip>
       </div>
@@ -393,28 +393,15 @@ export default {
 </script>
 
 <style scoped>
-:root {
-  --color-primary: #c23000;
-  --color-secondary: #fcb10a;
-  --color-blue: #14235e;
-  --color-light: #f7f2ed;
-  --color-dark: #0a0b0f;
-}
-
 .info-accent,
 .section-heading .add-recipe-info,
 .form-section .add-recipe-info {
-  color: #14235e;
+  color: var(--color-blue);
 }
 
 .primary-btn {
   background: var(--color-primary);
   border-radius: 999px;
-}
-
-.secondary-btn {
-  border-color: var(--color-blue);
-  color: var(--color-blue);
 }
 
 .v-btn.bg-black,
@@ -443,9 +430,13 @@ export default {
   background: white;
 }
 
+.privacy-toggle {
+  color: white;
+}
+
 .form-header {
   padding: 32px;
-  background: #14235e;
+  background: var(--color-blue);
   color: white;
   display: flex;
   justify-content: space-between;
@@ -455,7 +446,7 @@ export default {
 
 .recipe-management {
   text-transform: uppercase;
-  color: var(--color-dark);
+  color: white;
   letter-spacing: 0.12em;
   font-size: 12px;
   opacity: 0.7;

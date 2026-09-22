@@ -26,10 +26,9 @@
         </div>
       </div>
 
-      <div class="recipe-grid">
+      <div class="recipes-scroll">
         <RecipeCard
-          class="recipe-card"
-          v-for="recipe in recommendedRecipes"
+          v-for="recipe in recommendedRecipes.slice(0, 10)"
           :key="recipe.id"
           :recipe="recipe"
           :isOwnRecipe="false"
@@ -45,9 +44,9 @@
         </div>
       </div>
 
-      <div v-if="recentlyViewedRecipes.length" class="recipe-grid">
+      <div v-if="recentlyViewedRecipes.length" class="recipes-scroll">
         <RecipeCard
-          v-for="recipe in recentlyViewedRecipes"
+          v-for="recipe in recentlyViewedRecipes.slice(0, 10)"
           :key="recipe.id"
           :recipe="recipe"
           :isOwnRecipe="false"
@@ -75,14 +74,12 @@
         </v-btn>
       </div>
 
-      <div v-if="recipes.length" class="recipe-grid">
+      <div v-if="recipes.length" class="recipes-grid">
         <RecipeCard
-          class="recipe-card"
           v-for="recipe in recipes.slice(0, 4)"
           :key="recipe.id"
           :recipe="recipe"
           :isOwnRecipe="true"
-          @recipe-deleted="$emit('recipe-deleted', $event)"
         />
       </div>
 
@@ -104,53 +101,6 @@ import RecipeCard from "@/components/RecipeCard.vue";
 import Loading from "@/components/Loading.vue";
 import { VBtn, VIcon } from "vuetify/components";
 
-const recommendedRecipesMock = [
-  {
-    id: "mock-1",
-    name: "Creamy Chicken Pasta",
-    username: "Emma",
-    imageUrl: "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9",
-    difficulty: "Easy",
-    preparationTime: 25,
-    category: ["Lunch", "Dinner"],
-    rating: 4.7,
-    numberOfRatings: 32,
-  },
-  {
-    id: "mock-2",
-    name: "Blueberry Pancakes",
-    username: "Mia",
-    imageUrl: "https://images.unsplash.com/photo-1528207776546-365bb710ee93",
-    difficulty: "Easy",
-    preparationTime: 20,
-    category: ["Breakfast", "Dessert"],
-    rating: 4.9,
-    numberOfRatings: 87,
-  },
-  {
-    id: "mock-3",
-    name: "Vegetable Stir Fry",
-    username: "Noah",
-    imageUrl: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd",
-    difficulty: "Medium",
-    preparationTime: 35,
-    category: ["Lunch", "Dinner"],
-    rating: 4.5,
-    numberOfRatings: 45,
-  },
-  {
-    id: "mock-4",
-    name: "Chocolate Lava Cake",
-    username: "Sofia",
-    imageUrl: "https://images.unsplash.com/photo-1563805042-7684c019e1cb",
-    difficulty: "Hard",
-    preparationTime: 50,
-    category: ["Dessert"],
-    rating: 4.8,
-    numberOfRatings: 120,
-  },
-];
-
 export default {
   name: "HomePage",
 
@@ -164,7 +114,7 @@ export default {
   data() {
     return {
       recipes: [],
-      recommendedRecipes: recommendedRecipesMock,
+      recommendedRecipes: [],
       recentlyViewedRecipes: [],
       loading: true,
       username: "",
@@ -234,12 +184,6 @@ export default {
 
 <style scoped>
 .home-page {
-  --color-primary: #c23000;
-  --color-secondary: #fcb10a;
-  --color-blue: #14235e;
-  --color-light: #f7f2ed;
-  --color-dark: #0a0b0f;
-
   min-height: 100vh;
   padding: 42px 7vw;
   background: var(--color-light);
@@ -288,7 +232,6 @@ export default {
 .section-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
   gap: 16px;
   margin-bottom: 20px;
 }
@@ -307,7 +250,7 @@ export default {
 
 .recipe-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 18px;
 }
 
@@ -336,13 +279,9 @@ export default {
   margin: 8px 0 18px;
 }
 
-.recipe-card {
-  min-width: 350px;
-}
-
 @media (max-width: 1100px) {
   .recipe-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .hero-section {

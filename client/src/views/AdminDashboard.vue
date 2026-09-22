@@ -371,12 +371,6 @@ export default {
 
 <style scoped>
 .admin-page {
-  --color-primary: #c23000;
-  --color-secondary: #fcb10a;
-  --color-blue: #14235e;
-  --color-light: #f7f2ed;
-  --color-dark: #0a0b0f;
-
   min-height: 100vh;
   padding: 42px 7vw;
   background: var(--color-light);
