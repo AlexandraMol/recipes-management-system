@@ -1,5 +1,5 @@
 <template>
-  <main class="shopping-page">
+  <main class="shopping-page" v-if="!loading">
     <v-card class="shopping-card" elevation="8">
       <div class="shopping-header">
         <div>
@@ -157,6 +157,7 @@
       </div>
     </v-card>
   </main>
+  <Loading v-else></Loading>
 </template>
 
 <script>
@@ -172,6 +173,7 @@ import {
   VCheckbox,
   VImg,
 } from "vuetify/components";
+import Loading from "@/components/Loading.vue";
 
 import { mapGetters } from "vuex";
 
@@ -188,6 +190,7 @@ export default {
     VChip,
     VCheckbox,
     VImg,
+    Loading,
   },
 
   data() {
@@ -197,6 +200,7 @@ export default {
       recipeSearch: "",
       selectedRecipeIds: [],
       shoppingList: [],
+      loading: true,
     };
   },
 
@@ -248,9 +252,14 @@ export default {
     },
   },
 
-  mounted() {
-    this.getUserRecipes();
-    this.getFavoriteRecipes();
+  async mounted() {
+    this.loading = true;
+
+    try {
+      await Promise.all([this.getUserRecipes(), this.getFavoriteRecipes()]);
+    } finally {
+      this.loading = false;
+    }
   },
 
   methods: {
@@ -328,7 +337,14 @@ export default {
     },
 
     async copyShoppingList() {
-      await navigator.clipboard.writeText(this.shoppingListText);
+      if (!this.shoppingListText) return;
+
+      try {
+        await navigator.clipboard.writeText(this.shoppingListText);
+        console.log("Shopping list copied successfully");
+      } catch (error) {
+        console.error("Failed to copy shopping list:", error);
+      }
     },
 
     shareOnWhatsApp() {
