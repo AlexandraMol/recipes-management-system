@@ -535,8 +535,7 @@ export default {
 
 .dynamic-card {
   position: relative;
-  background: var(--color-primary);
-  border: 1px solid #eeeeee;
+  border: 1px solid var(--color-primary);
   border-radius: 20px;
   padding: 18px 18px 18px 56px;
   margin-bottom: 14px;

@@ -1,8 +1,13 @@
 <template>
-  <v-card :key="recipe.id" class="mx-auto" max-width="344">
+  <v-card :key="recipe.id" class="recipe-card" max-width="344">
     <v-img height="200px" :src="recipe.imageUrl" cover></v-img>
 
-    <v-card-title> {{ recipe.name }} </v-card-title>
+    <div class="title-section">
+      <v-card-title> {{ recipe.name }} </v-card-title>
+      <div v-if="hasMatchPercentage" class="match-badge">
+        {{ recipe.matchPercentage }}% match
+      </div>
+    </div>
     <v-card-subtitle> {{ recipe?.category?.join(", ") }} </v-card-subtitle>
 
     <v-card-actions>
@@ -52,6 +57,12 @@ export default {
   },
   computed: {
     ...mapGetters(["currentUser"]),
+    hasMatchPercentage() {
+      return (
+        this.recipe.matchPercentage !== null &&
+        this.recipe.matchPercentage !== undefined
+      );
+    },
   },
   emits: ["recipe-deleted"],
   methods: {
@@ -84,13 +95,20 @@ export default {
 };
 </script>
 
-<style>
-.v-card {
+<style scoped>
+.recipe-card {
   border: 1px solid black;
   width: 100%;
   height: 100%;
+  min-width: 0;
 }
+
 .v-card-actions {
+  display: flex;
+  justify-content: space-between;
+}
+
+.title-section {
   display: flex;
   justify-content: space-between;
 }
@@ -100,5 +118,20 @@ export default {
 }
 .card-button:hover {
   background-color: antiquewhite;
+}
+
+.match-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  margin: 2px;
+  padding: 6px 10px;
+  border-radius: 999px;
+
+  background: var(--color-secondary);
+  color: var(--color-dark);
+
+  font-size: 12px;
+  font-weight: 800;
 }
 </style>

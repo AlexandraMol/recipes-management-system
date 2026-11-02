@@ -63,6 +63,7 @@
       </div>
       <RecipeCollection
         :recipes="favoriteRecipes"
+        :max-items="8"
         empty-title="No favorite recipes yet"
         empty-text="Explore recipes and save your favorites here."
         icon="mdi-heart-outline"
@@ -79,6 +80,7 @@
 
       <RecipeCollection
         :recipes="recentlyViewedRecipes"
+        :max-items="8"
         empty-title="No recently viewed recipes yet"
         empty-text="Open recipes from Explore and they will appear here."
         icon="mdi-history"

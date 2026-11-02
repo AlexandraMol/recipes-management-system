@@ -33,9 +33,9 @@
     </div>
 
     <!-- Recipes -->
-    <div v-if="filteredRecipes.length" class="recipes-grid">
+    <div v-if="displayedRecipes.length" class="recipes-grid">
       <RecipeCard
-        v-for="recipe in filteredRecipes"
+        v-for="recipe in displayedRecipes"
         :key="recipe.id"
         :recipe="recipe"
         :isOwnRecipe="isOwnRecipe"
@@ -89,6 +89,11 @@ export default {
     recipes: {
       type: Array,
       default: () => [],
+    },
+
+    maxItems: {
+      type: Number,
+      default: null,
     },
 
     isOwnRecipe: {
@@ -171,6 +176,13 @@ export default {
 
         return matchesSearch && matchesCategory && matchesDifficulty;
       });
+    },
+    displayedRecipes() {
+      if (!this.maxItems) {
+        return this.filteredRecipes;
+      }
+
+      return this.filteredRecipes.slice(0, this.maxItems);
     },
   },
 

@@ -1,5 +1,5 @@
 from urllib.parse import unquote
-from flask import request, jsonify
+from flask import request, jsonify, g
 from firebase.firebase_config import db, storage
 from google.cloud.firestore import Query
 from utils.convertors import convert_from_base, convert_to_base
@@ -65,9 +65,25 @@ def get_user_recipes(username):
         }), 400
     
 def get_other_user_recipes(username):
-
     try:
+        # 1. Identify the authenticated user
+        uid = g.user.get("uid")
 
+        # 2. Get saved excluded ingredients
+        user_doc = db.collection("users").document(uid).get()
+
+        excluded_ingredients = []
+
+        if user_doc.exists:
+            user_data = user_doc.to_dict() or {}
+
+            excluded_ingredients = [
+                ingredient.lower().strip()
+                for ingredient in user_data.get("excludedIngredients", [])
+                if isinstance(ingredient, str) and ingredient.strip()
+            ]
+
+        # 3. Get public recipes
         recipes_snapshot = (
             db.collection("recipes")
             .where("visibility", "==", "Public")
@@ -77,14 +93,37 @@ def get_other_user_recipes(username):
         recipes = []
 
         for doc in recipes_snapshot:
-
             recipe = doc.to_dict()
 
-            if recipe.get("username") != username:
-                recipes.append({
-                    "id": doc.id,
-                    **recipe
-                })
+            # Don't display user's own recipes
+            if recipe.get("username") == username:
+                continue
+
+            # 4. Extract recipe ingredients
+            ingredient_names = [
+                ingredient.get("name", "").lower().strip()
+                for ingredient in recipe.get("ingredients", [])
+                if isinstance(ingredient, dict)
+                and isinstance(ingredient.get("name"), str)
+            ]
+
+            # 5. Check excluded ingredients
+            contains_excluded = any(
+                excluded in recipe_ingredient
+                or recipe_ingredient in excluded
+                for excluded in excluded_ingredients
+                for recipe_ingredient in ingredient_names
+                if recipe_ingredient
+            )
+
+            if contains_excluded:
+                continue
+
+            # 6. Add valid recipe
+            recipes.append({
+                "id": doc.id,
+                **recipe
+            })
 
         return jsonify({
             "data": recipes
@@ -247,11 +286,12 @@ def generate_shopping_list():
     except Exception as error:
         return jsonify({"error": str(error)}), 400
     
-def search_recipes():
+def search_recipes(username):
     try:
-        data = request.json
+        data = request.json or {}
 
         search_text = data.get("searchText", "").lower().strip()
+
         included_ingredients = [
             item.lower().strip()
             for item in data.get("includedIngredients", [])
@@ -264,7 +304,12 @@ def search_recipes():
             if item.strip()
         ]
 
-        categories = data.get("categories", [])
+        categories = [
+            category.lower().strip()
+            for category in data.get("categories", [])
+            if category.strip()
+        ]
+
         difficulties = data.get("difficulties", [])
         max_preparation_time = data.get("maxPreparationTime")
 
@@ -279,62 +324,187 @@ def search_recipes():
         for doc in recipes_snapshot:
             recipe = doc.to_dict()
 
-            recipe_name = recipe.get("name", "").lower()
-            recipe_category = recipe.get("category", [])
-            recipe_difficulty = recipe.get("difficulty", "")
-            recipe_time = int(recipe.get("preparationTime", 0))
-
-            ingredients = recipe.get("ingredients", [])
-            ingredient_names = [
-                ingredient.get("name", "").lower().strip()
-                for ingredient in ingredients
-            ]
-
-            # 1. Search by recipe name
-            if search_text and search_text not in recipe_name:
+            if recipe.get("username") == username:
                 continue
 
-            # 2. Must contain selected ingredients
-            if included_ingredients:
-                if not all(
-                    ingredient in ingredient_names
-                    for ingredient in included_ingredients
+            recipe_name = (
+                recipe.get("name", "")
+                .lower()
+                .strip()
+            )
+
+            recipe_categories = [
+                category.lower().strip()
+                for category in recipe.get("category", [])
+            ]
+
+            recipe_difficulty = recipe.get(
+                "difficulty", ""
+            )
+
+            recipe_time = int(
+                recipe.get("preparationTime", 0)
+            )
+
+            ingredients = recipe.get("ingredients", [])
+
+            ingredient_names = [
+                ingredient.get("name", "")
+                .lower()
+                .strip()
+                for ingredient in ingredients
+                if ingredient.get("name")
+            ]
+
+            # ----------------------------------------
+            # 1. QUICK SEARCH
+            # Recipe name OR ingredient OR category
+            # ----------------------------------------
+
+            if search_text:
+                matches_name = (
+                    search_text in recipe_name
+                )
+
+                matches_ingredient = any(
+                    search_text in ingredient
+                    for ingredient in ingredient_names
+                )
+
+                matches_category = any(
+                    search_text in category
+                    for category in recipe_categories
+                )
+
+                if not (
+                    matches_name
+                    or matches_ingredient
+                    or matches_category
                 ):
                     continue
 
-            # 3. Must NOT contain excluded ingredients
+            # ----------------------------------------
+            # 2. EXCLUDED INGREDIENTS
+            # ----------------------------------------
+
             if excluded_ingredients:
-                if any(
-                    excluded in ingredient_names
+                contains_excluded = any(
+                    any(
+                        excluded in recipe_ingredient
+                        or recipe_ingredient in excluded
+                        for recipe_ingredient in ingredient_names
+                    )
                     for excluded in excluded_ingredients
-                ):
+                )
+
+                if contains_excluded:
                     continue
 
-            # 4. Category filter
+            # ----------------------------------------
+            # 3. CATEGORY FILTER
+            # ----------------------------------------
+
             if categories:
-                if not any(category in recipe_category for category in categories):
+                matches_selected_category = any(
+                    category in recipe_categories
+                    for category in categories
+                )
+
+                if not matches_selected_category:
                     continue
 
-            # 5. Difficulty filter
+            # ----------------------------------------
+            # 4. DIFFICULTY FILTER
+            # ----------------------------------------
+
             if difficulties:
                 if recipe_difficulty not in difficulties:
                     continue
 
-            # 6. Preparation time filter
+            # ----------------------------------------
+            # 5. PREPARATION TIME FILTER
+            # ----------------------------------------
+
             if max_preparation_time:
                 if recipe_time > int(max_preparation_time):
                     continue
 
+            # ----------------------------------------
+            # 6. INGREDIENT COMPATIBILITY
+            # ----------------------------------------
+
+            match_percentage = None
+            matched_ingredients = []
+
+            # Start with ingredients explicitly provided
+            # through advanced search.
+            available_ingredients = included_ingredients.copy()
+
+            # If quick search matches an ingredient, also use
+            # that ingredient for compatibility calculation.
+            if search_text:
+                matches_ingredient = any(
+                    search_text in ingredient
+                    for ingredient in ingredient_names
+                )
+
+                if matches_ingredient and search_text not in available_ingredients:
+                    available_ingredients.append(search_text)
+
+            if available_ingredients:
+                for required_ingredient in ingredient_names:
+                    ingredient_found = any(
+                        available in required_ingredient
+                        or required_ingredient in available
+                        for available in available_ingredients
+                    )
+
+                    if ingredient_found:
+                        matched_ingredients.append(required_ingredient)
+
+                if ingredient_names:
+                    match_percentage = round(
+                        len(matched_ingredients)
+                        / len(ingredient_names)
+                        * 100
+                    )
+                else:
+                    match_percentage = 0
+
+                # Exclude recipes with no matching ingredients
+                # only when advanced ingredient filtering is active.
+                if included_ingredients and match_percentage == 0:
+                    continue
+            # ----------------------------------------
+            # 7. ADD RESULT
+            # ----------------------------------------
+
             results.append({
                 "id": doc.id,
-                **recipe
+                **recipe,
+                "matchPercentage": match_percentage,
+                "matchedIngredients": matched_ingredients,
             })
 
-        return jsonify({"data": results}), 200
+        # ----------------------------------------
+        # 8. SORT BY COMPATIBILITY
+        # ----------------------------------------
+
+        if included_ingredients or search_text:
+            results.sort(
+                key=lambda recipe: recipe.get("matchPercentage") or 0,
+                reverse=True,
+            )
+
+        return jsonify({
+            "data": results
+        }), 200
 
     except Exception as error:
-        return jsonify({"error": str(error)}), 400
-
+        return jsonify({
+            "error": str(error)
+        }), 400
+    
 def get_recently_viewed_recipes(username):
     try:
         history_snapshot = (
@@ -491,25 +661,47 @@ def toggle_favorite_recipe(recipe_id):
     
 def rate_recipe(recipe_id):
     try:
-        data = request.json
+        data = request.json or {}
 
         username = data.get("username")
         rating_value = data.get("rating")
 
         if not username or rating_value is None:
-            return jsonify({"message": "Missing username or rating"}), 400
+            return jsonify({
+                "message": "Missing username or rating"
+            }), 400
 
-        rating_value = int(rating_value)
+        # Validate rating
+        try:
+            rating_value = int(rating_value)
+        except (ValueError, TypeError):
+            return jsonify({
+                "message": "Invalid rating value"
+            }), 400
 
         if rating_value < 1 or rating_value > 5:
-            return jsonify({"message": "Rating must be between 1 and 5"}), 400
+            return jsonify({
+                "message": "Rating must be between 1 and 5"
+            }), 400
 
+        # Get recipe
         recipe_ref = db.collection("recipes").document(recipe_id)
-        recipe = recipe_ref.get()
+        recipe_doc = recipe_ref.get()
 
-        if not recipe.exists:
-            return jsonify({"message": "Recipe not found"}), 404
+        if not recipe_doc.exists:
+            return jsonify({
+                "message": "Recipe not found"
+            }), 404
 
+        recipe = recipe_doc.to_dict()
+
+        # Prevent authors from rating their own recipes
+        if recipe.get("username") == username:
+            return jsonify({
+                "message": "You cannot rate your own recipe"
+            }), 403
+
+        # Save or update rating
         rating_id = f"{username}_{recipe_id}"
 
         db.collection("ratings").document(rating_id).set({
@@ -519,6 +711,7 @@ def rate_recipe(recipe_id):
             "createdAt": datetime.utcnow().isoformat()
         })
 
+        # Recalculate average rating
         ratings_snapshot = (
             db.collection("ratings")
             .where("recipeId", "==", recipe_id)
@@ -531,17 +724,20 @@ def rate_recipe(recipe_id):
         ]
 
         number_of_ratings = len(ratings)
+
         average_rating = (
             sum(ratings) / number_of_ratings
             if number_of_ratings > 0
             else 0
         )
 
+        # Update recipe statistics
         recipe_ref.update({
             "averageRating": round(average_rating, 2),
             "numberOfRatings": number_of_ratings
         })
 
+        # Save interaction
         db.collection("viewHistory").document(
             f"{username}_{recipe_id}_rating"
         ).set({
@@ -559,8 +755,10 @@ def rate_recipe(recipe_id):
         }), 200
 
     except Exception as error:
-        return jsonify({"error": str(error)}), 400
-
+        return jsonify({
+            "error": str(error)
+        }), 400
+    
 def get_recipe_status(recipe_id, username):
     try:
         favorite_id = f"{username}_{recipe_id}"

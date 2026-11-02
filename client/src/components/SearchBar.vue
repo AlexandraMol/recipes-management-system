@@ -1,9 +1,10 @@
 <template>
   <div class="smart-search">
-    <div class="search-bar" @click="expanded = true">
+    <!-- Quick search -->
+    <div class="search-bar">
       <v-text-field
         v-model="filters.searchText"
-        label="Search recipes or ingredients..."
+        label="Search recipes, ingredients or categories..."
         prepend-inner-icon="mdi-magnify"
         hide-details
         @keyup.enter="searchRecipes"
@@ -14,15 +15,21 @@
       </v-btn>
     </div>
 
+    <!-- Advanced filters -->
     <v-expand-transition>
       <div v-if="expanded" class="advanced-panel">
+        <!-- Available ingredients -->
         <v-text-field
+          class="text-field"
           v-model="ingredientInput"
-          label="Ingredients you have / Recipe name"
+          label="Ingredients you have"
+          placeholder="e.g. chicken, rice, tomato"
+          hint="Separate multiple ingredients with commas"
+          persistent-hint
           @keyup.enter="addIncludedIngredient"
         />
 
-        <div class="chips">
+        <div v-if="filters.includedIngredients.length" class="chips">
           <v-chip
             v-for="ingredient in filters.includedIngredients"
             :key="ingredient"
@@ -33,54 +40,68 @@
           </v-chip>
         </div>
 
-        <v-text-field
-          v-model="exclusionInput"
-          label="Exclude ingredients"
-          @keyup.enter="addExcludedIngredient"
-        />
+        <!-- Temporary exclusions -->
+        <div class="filter-group">
+          <v-text-field
+            class="text-field"
+            v-model="exclusionInput"
+            label="Excluded ingredients"
+            placeholder="e.g. peanuts, mushrooms"
+            hint="Your saved preferences are included by default. Remove them for this search if needed."
+            persistent-hint
+            @keyup.enter="addExcludedIngredient"
+          />
 
-        <div class="chips">
-          <v-chip
-            v-for="ingredient in filters.excludedIngredients"
-            :key="ingredient"
-            closable
-            color="red"
-            @click:close="removeExcludedIngredient(ingredient)"
-          >
-            {{ ingredient }}
-          </v-chip>
+          <div v-if="filters.excludedIngredients.length" class="chips">
+            <v-chip
+              v-for="ingredient in filters.excludedIngredients"
+              :key="ingredient"
+              closable
+              class="excluded-chip"
+              @click:close="removeExcludedIngredient(ingredient)"
+            >
+              {{ ingredient }}
+            </v-chip>
+          </div>
         </div>
 
+        <!-- Category -->
         <v-select
           v-model="filters.categories"
           :items="categories"
           label="Category"
           multiple
           chips
+          clearable
         />
 
+        <!-- Difficulty -->
         <v-select
           v-model="filters.difficulties"
           :items="difficulties"
           label="Difficulty"
           multiple
           chips
+          clearable
         />
 
+        <!-- Preparation time -->
         <v-text-field
           v-model="filters.maxPreparationTime"
-          label="Max preparation time"
+          label="Maximum preparation time"
           type="number"
           suffix="min"
+          min="1"
         />
 
         <div class="actions">
           <v-btn variant="text" @click="clearFilters"> Clear </v-btn>
 
-          <v-btn color="black" @click="searchRecipes"> Search </v-btn>
+          <v-btn class="primary-btn" @click="searchRecipes"> Search </v-btn>
         </div>
       </div>
     </v-expand-transition>
+
     <div v-if="expanded" class="search-backdrop" @click="expanded = false" />
   </div>
 </template>
@@ -88,9 +109,9 @@
 <script>
 import axios from "axios";
 import { mapGetters } from "vuex";
+
 import {
   VTextField,
-  VChipGroup,
   VChip,
   VSelect,
   VBtn,
@@ -101,14 +122,8 @@ import {
 export default {
   name: "SmartSearchBar",
 
-  emits: ["results"],
-
-  computed: {
-    ...mapGetters(["currentUser"]),
-  },
   components: {
     VTextField,
-    VChipGroup,
     VChip,
     VSelect,
     VBtn,
@@ -116,14 +131,19 @@ export default {
     VIcon,
   },
 
+  emits: ["results"],
+
   data() {
     return {
       expanded: false,
+
+      profileExcludedIngredients: [],
 
       ingredientInput: "",
       exclusionInput: "",
 
       categories: ["Breakfast", "Lunch", "Dinner", "Snack", "Dessert"],
+
       difficulties: ["Easy", "Medium", "Hard"],
 
       filters: {
@@ -137,13 +157,26 @@ export default {
     };
   },
 
+  computed: {
+    ...mapGetters(["currentUser"]),
+  },
+
+  mounted() {
+    this.getUserPreferences();
+  },
+
   methods: {
     addIncludedIngredient() {
-      const value = this.ingredientInput.trim().toLowerCase();
+      const ingredients = this.ingredientInput
+        .split(",")
+        .map((ingredient) => ingredient.trim().toLowerCase())
+        .filter(Boolean);
 
-      if (value && !this.filters.includedIngredients.includes(value)) {
-        this.filters.includedIngredients.push(value);
-      }
+      ingredients.forEach((ingredient) => {
+        if (!this.filters.includedIngredients.includes(ingredient)) {
+          this.filters.includedIngredients.push(ingredient);
+        }
+      });
 
       this.ingredientInput = "";
     },
@@ -154,11 +187,16 @@ export default {
     },
 
     addExcludedIngredient() {
-      const value = this.exclusionInput.trim().toLowerCase();
+      const ingredients = this.exclusionInput
+        .split(",")
+        .map((ingredient) => ingredient.trim().toLowerCase())
+        .filter(Boolean);
 
-      if (value && !this.filters.excludedIngredients.includes(value)) {
-        this.filters.excludedIngredients.push(value);
-      }
+      ingredients.forEach((ingredient) => {
+        if (!this.filters.excludedIngredients.includes(ingredient)) {
+          this.filters.excludedIngredients.push(ingredient);
+        }
+      });
 
       this.exclusionInput = "";
     },
@@ -172,7 +210,7 @@ export default {
       this.filters = {
         searchText: "",
         includedIngredients: [],
-        excludedIngredients: [],
+        excludedIngredients: [...this.profileExcludedIngredients],
         categories: [],
         difficulties: [],
         maxPreparationTime: null,
@@ -180,38 +218,87 @@ export default {
 
       this.ingredientInput = "";
       this.exclusionInput = "";
+
+      this.searchRecipes();
+    },
+
+    async getUserPreferences() {
+      try {
+        const token = await this.currentUser.getIdToken();
+
+        const response = await axios.get(
+          "http://localhost:5000/api/user/preferences",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        const excludedIngredients =
+          response.data.data?.excludedIngredients || [];
+
+        this.profileExcludedIngredients = [...excludedIngredients];
+
+        this.filters.excludedIngredients = [...excludedIngredients];
+      } catch (error) {
+        console.error("Failed to load user preferences:", error);
+      }
     },
 
     async searchRecipes() {
-      const token = await this.currentUser.getIdToken();
+      try {
+        // Add text still present in the ingredient fields
+        // before performing the search.
+        if (this.ingredientInput.trim()) {
+          this.addIncludedIngredient();
+        }
 
-      const response = await axios.post(
-        "http://localhost:5000/api/recipe/search",
-        this.filters,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
+        if (this.exclusionInput.trim()) {
+          this.addExcludedIngredient();
+        }
+
+        const token = await this.currentUser.getIdToken();
+
+        const response = await axios.post(
+          `http://localhost:5000/api/recipe/search/${this.currentUser.displayName}`,
+          this.filters,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
           },
-        },
-      );
+        );
 
-      this.$emit("results", response.data.data);
-      this.expanded = false;
+        this.$emit("results", response.data.data);
+
+        this.expanded = false;
+      } catch (error) {
+        console.error("Recipe search failed:", error);
+      }
     },
   },
 };
 </script>
-<style>
+
+<style scoped>
 .smart-search {
   width: 100%;
   max-width: 850px;
   position: relative;
+  z-index: 1000;
 }
 
 .search-bar {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.text-field {
+  padding: 0;
+  margin: 5px;
 }
 
 .advanced-panel {
@@ -221,11 +308,13 @@ export default {
 
   width: 100%;
 
-  z-index: 1000;
+  z-index: 1001;
   margin-top: 12px;
   padding: 20px;
+
   border-radius: 18px;
   background: white;
+
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
 }
 
@@ -234,6 +323,11 @@ export default {
   flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 12px;
+}
+
+.excluded-chip {
+  background: #fff1f0 !important;
+  color: var(--color-primary) !important;
 }
 
 .actions {
@@ -249,5 +343,12 @@ export default {
   background: rgba(0, 0, 0, 0.15);
 
   z-index: 999;
+}
+
+@media (max-width: 700px) {
+  .advanced-panel {
+    max-height: 75vh;
+    overflow-y: auto;
+  }
 }
 </style>

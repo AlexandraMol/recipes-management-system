@@ -76,10 +76,10 @@ def get_other_recipes(username):
 def shopping_list():
     return generate_shopping_list()
 
-@recipe_routes.route("/search", methods=["POST"])
+@recipe_routes.route("/search/<username>", methods=["POST"])
 @authorize
-def search():
-    return search_recipes()
+def search(username):
+    return search_recipes(username)
 
 @recipe_routes.route("/favorite/<recipe_id>", methods=["POST"])
 @authorize
