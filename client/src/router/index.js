@@ -83,7 +83,12 @@ const routes = [
   },
   {
     path: "/admin",
+    name: "Admin",
     component: AdminDashboard,
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true,
+    },
   },
   {
     path: "/:catchAll(.*)",
@@ -96,13 +101,26 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, from, next) => {
-  const isLoggedIn = store.getters.isLoggedIn;
-  if (to.meta.requiresAuth && !isLoggedIn) {
-    next("/login");
-  } else {
-    next();
+const authInitialization = store.dispatch("getUser");
+
+router.beforeEach(async (to, from, next) => {
+  await authInitialization;
+
+  if (to.meta.requiresAuth && !store.getters.isLoggedIn) {
+    return next("/login");
   }
+
+  if (to.meta.requiresAdmin) {
+    if (store.state.role === null) {
+      await store.dispatch("fetchUserRole");
+    }
+
+    if (!store.getters.isAdmin) {
+      return next("/");
+    }
+  }
+
+  next();
 });
 
 export default router;

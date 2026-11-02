@@ -1,7 +1,8 @@
 from flask import Blueprint
 from controllers.user_controller import (
     get_user_preferences,
-    update_user_preferences
+    update_user_preferences,
+    get_current_user
 )
 from middlewares.authorize import authorize
 
@@ -18,3 +19,8 @@ def preferences():
 @authorize
 def update_preferences():
     return update_user_preferences()
+
+@user_routes.route("/me", methods=["GET"])
+@authorize
+def current_user():
+    return get_current_user()

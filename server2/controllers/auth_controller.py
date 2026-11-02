@@ -47,6 +47,7 @@ def register():
         db.collection("users").document(user.uid).set({
             "username": username,
             "email": email,
+            "role": "user",
             "createdAt": datetime.utcnow().isoformat()
         })
 

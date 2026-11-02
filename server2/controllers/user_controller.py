@@ -61,3 +61,22 @@ def update_user_preferences():
         return jsonify({
             "error": str(error)
         }), 400
+
+def get_current_user():
+    uid = g.user["uid"]
+
+    user_doc = db.collection("users").document(uid).get()
+
+    if not user_doc.exists:
+        return jsonify({
+            "message": "User not found."
+        }), 404
+
+    user_data = user_doc.to_dict() or {}
+
+    return jsonify({
+        "uid": uid,
+        "username": user_data.get("username"),
+        "email": user_data.get("email"),
+        "role": user_data.get("role", "user")
+    }), 200

@@ -41,6 +41,21 @@
           <v-icon>mdi-account</v-icon>
         </v-btn>
 
+        <template v-if="isAdmin">
+          <v-btn v-if="!isMobile" @click="redirect('/admin')" text>
+            Admin Dashboard
+          </v-btn>
+
+          <v-btn
+            v-else
+            @click="redirect('/admin')"
+            icon
+            aria-label="Admin Dashboard"
+          >
+            <v-icon>mdi-shield-account</v-icon>
+          </v-btn>
+        </template>
+
         <v-btn @click="logoutUser" text v-if="!isMobile"> Logout </v-btn>
         <v-btn @click="logoutUser" icon v-else>
           <v-icon>mdi-logout</v-icon>
@@ -64,7 +79,7 @@ import { mapGetters, mapActions } from "vuex";
 export default {
   name: "App",
   computed: {
-    ...mapGetters(["isLoggedIn"]),
+    ...mapGetters(["isLoggedIn", "isAdmin"]),
   },
   data() {
     return {
